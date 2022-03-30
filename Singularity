@@ -12,31 +12,33 @@ From: debian:buster-slim
     apt-get update
     apt-get -y install wget unzip libxext6 libxt6 moreutils
 
-    # download software
+    # download software & unzip
     MCRURL="https://ssd.mathworks.com/supportfiles/downloads/R2017b/deployment_files/R2017b/installers/glnxa64/MCR_R2017b_glnxa64_installer.zip"
-    SPMURL="http://www.neuro.uni-jena.de/cat12/CAT12.7_r1743_R2017b_MCR_Linux.zip"
+    SPMURL="http://www.neuro.uni-jena.de/cat12/CAT12.8.1_r1980_R2017b_MCR_Linux.zip"
 
     cd /downloads
     wget "${MCRURL}" && unzip -d /downloads/MCR MCR_R2017b_glnxa64_installer.zip
-    wget "${SPMURL}" && unzip -d /code/SPM CAT12.7_r1743_R2017b_MCR_Linux.zip
-    mv /code/SPM/CAT12.7_r1743_R2017b_MCR_Linux /code/SPM/MCR_Linux/
+    wget "${SPMURL}" && unzip -d /code/SPM CAT12.8.1_r1980_R2017b_MCR_Linux.zip
 
     # install MCR
     /downloads/MCR/install -mode silent -agreeToLicense yes
 
+    # generalize CAT12 version
+    mv /code/SPM/CAT12.8.1_r1980_R2017b_MCR_Linux/ /code/SPM/MCR_Linux/
+
     # install SPM
     /code/SPM/MCR_Linux/run_spm12.sh /usr/local/MATLAB/MATLAB_Runtime/v93 quit
-    cd /code/SPM/MCR_Linux && chmod +rx run_spm12.sh spm12.sh spm12
+    cd /code/SPM/MCR_Linux && chmod +rx run_spm12.sh spm12.sh spm12 spm12.ctf
 
     # install CAT standalone interface
-    STANDALONE="/code/SPM/MCR_Linux/spm12_mcr/home/gaser/gaser/spm/spm12/toolbox/cat12/standalone"
+    STANDALONE="/code/SPM/MCR_Linux/standalone"
     cd ${STANDALONE} && chmod +rx *.sh
     cd /code && ln -s ${STANDALONE}/*.sh .
-    cd /batch && ln -s ${STANDALONE}/*.txt .
+    cd /batch && ln -s ${STANDALONE}/*.m .
 
     # set permissions
     find /code -type f -print0 | xargs -0 chmod +r
-    find /code/SPM/MCR_Linux/spm12_mcr/home/gaser/gaser/spm/spm12/toolbox/cat12/CAT.glnx86 -type f -print0 | xargs -0 chmod +rx
+    find /code/SPM/MCR_Linux/spm12_mcr/ -name 'CAT.glnx86' -print0 | xargs -0 chmod +rx -R
 
     rm -fr /downloads
 
@@ -52,8 +54,9 @@ From: debian:buster-slim
     exec /code/main "$@"
 
 %labels
-    Author Malgorzata Wierzba (m.wierzba@fz-juelich.de)
-    Version 1.0.1
+    Authors Malgorzata Wierzba (m.wierzba@fz-juelich.de)
+            Felix Hoffstaedter (f.hoffstaedter@fz-juelich.de)
+    Version 1.1
 
 %help
 
@@ -66,7 +69,7 @@ The container includes:
 
 - MATLAB Compiler Runtime (R2017b, 9.3)
 - Standalone version of SPM software (SPM12, r7771)
-- Computational Anatomy Toolbox (CAT12.7 r1743)
+- Computational Anatomy Toolbox (CAT12.8 r1980)
 - CAT interface scripts (cat_standalone.sh, cat_parallelize.sh).
 
 For more details on the exact version of the software used in this
@@ -79,8 +82,8 @@ In principle this container allows you to perform the very same types
 of analysis that are possible with the standalone version of CAT. It
 is assumed that the user is familiar with the content of the batch
 files dedicated for the use with the standalone version of CAT
-(cat_standalone_segment.txt, cat_standalone_simple.txt,
-cat_standalone_resample.txt, cat_standalone_smooth.txt) and can modify
+(cat_standalone_segment.m, cat_standalone_simple.m,
+cat_standalone_resample.m, cat_standalone_smooth.m) and can modify
 their content according to his/her needs. For more details, please
 refer to the CAT12 documentation and manual.
 
@@ -94,12 +97,12 @@ singularity run <container> <subcommand> <batch file> <arguments>
 
 To view a batch file, use the 'view' subcommand:
 
-singularity run container.simg view cat_standalone_smooth.txt
+singularity run container.simg view cat_standalone_smooth.m
 
 To copy a batch file to your computer, use the 'copy' subcommand and
 specify destination path as an additional argument:
 
-singularity run container.simg copy cat_standalone_smooth.txt $HOME
+singularity run container.simg copy cat_standalone_smooth.m $HOME
 
 Make sure that the specified path is mounted to the container (more
 information on this can be found below) and that you have write access
@@ -118,12 +121,12 @@ singularity run --cleanenv <container> <batch file> <arguments>
 To use a default batch file, use one of the files included in the
 container ('/batch'):
 singularity run --cleanenv container.simg \
-	-b /batch/cat_standalone_segment.txt \
+	-b /batch/cat_standalone_segment.m \
 	T1.nii
 
 To use your own, customised batch file, simply specify its path:
 singularity run --cleanenv container.simg \
-	-b $HOME/cat_standalone_segment.txt \
+	-b $HOME/cat_standalone_segment.m \
 	T1.nii
 
 
@@ -140,47 +143,217 @@ of the '/data' folder on your computer available in the '/mnt' folder
 inside the container, specify the mount point in the following way:
 
 singularity run --cleanenv --bind /data:/mnt container.simg \
-	-b /batch/cat_standalone_segment.txt \
+	-b /batch/cat_standalone_segment.m \
 	/mnt/T1.nii
 
 
 EXAMPLES:
 
-CAT12 segmentation batch:
-singularity run --cleanenv container.simg \
-	-b cat_standalone_segment.txt \
-	T1.nii
+USAGE:
+   cat_standalone.sh filename(s) [-s spm_standalone_folder] [-m mcr_folder] [-b batch_file]
+                                 [-a1 additional_argument1] [-a2 additional_argument2]
+                                 [-a add_to_batch]
 
-CAT12 simple processing batch:
-singularity run --cleanenv container.simg \
-	-b cat_standalone_simple.txt \
-	T1.nii
+   -s <DIR>    | --spm <DIR>     SPM12 folder of standalone version (can be also defined by SPMROOT)
+   -m <DIR>    | --mcr <DIR>     Matlab Compiler Runtime (MCR) folder (can be also defined by MCRROOT)
+   -b <FILE>   | --batch <FILE>  batch file to execute
+   -a1 <STRING>| --arg1 <STRING> 1st additional argument (otherwise use defaults or batch)
+   -a2 <STRING>| --arg2 <STRING> 2nd additional argument (otherwise use defaults or batch)
+   -a <STRING> | --add  <STRING> add option to batch file
 
-CAT12 resample & smooth batch:
-singularity run --cleanenv container.simg \
-	-b cat_standalone_resample.txt \
-	-a1 "12" -a2 "1" \
-	lh.thickness.T1
+   The first occurance of the parameter "<UNDEFINED>" in the batch file will be replaced by the
+   list of input files. You can use the existing batch files in this folder or create your own batch
+   file with the SPM12 batch editor and leave the data field undefined. Please note that for creating
+   your own batch file CAT12 has to be called in expert mode because the CAT12 standalone installation
+   will only run in expert mode to allow more options.
+   See cat_standalone_segment.m for an example.
 
-CAT12 volume smoothing batch:
-singularity run --cleanenv container.simg \
-	-b cat_standalone_smooth.txt \
-	-a1 "[6 6 6]" -a2 "'s6'" \
-	T1.nii
+   You can also define one or two optional arguments to change other parameters that are indicated by
+   "<UNDEFINED>" in the batch file. Please take care of the order of the "<UNDEFINED>" fields in the
+   batch file! If no additional arguments are defined the default values are used.
+   Also, you must use multiple quotes if the argument is a string (e.g. " 'your_string' ").
+
+   If you use a computer cluster it is recommended to use the batch files to only process one data set
+   and use a job or queue tool to call the (single) jobs on the cluster.
+
+PURPOSE:
+   Command line call of (CAT12) batch files for SPM12 standalone installation
+
+EXAMPLES
+   -----------------------------------------------------------------------------------------------
+   Segmentation
+     -a1 TPM
+     -a2 Shooting template
+   -----------------------------------------------------------------------------------------------
+   cat_standalone.sh -s $SPMROOT -m /Applications/MATLAB/MATLAB_Runtime/v93 \
+       -b ${cwd}/cat_standalone_segment.m sTRIO0001.nii
+   Preprocess (segment) the single file sTRIO0001.nii using the default CAT12 preprocessing batch.
+   SPM12 standalone version is located in $SPMROOT and Matlab Compiler Runtime in
+   /Applications/MATLAB/MATLAB_Runtime/v93.
+
+   cat_standalone.sh -s $SPMROOT -m /Applications/MATLAB/MATLAB_Runtime/v93 \
+       -b ${cwd}/cat_standalone_segment.m sTRIO000*.nii.gz \
+       -a1 " '${cat12_dir}/templates_MNI152NLin2009cAsym/TPM_Age11.5.nii' " \
+       -a2 " '${cat12_dir}/templates_MNI152NLin2009cAsym/Template_0_GS1mm.nii' "
+   Unzip and preprocess (segment) the files sTRIO0001.nii.gz using the default CAT12 preprocessing
+   batch, but use the children TPM provided with CAT12 and a 1mm Shooting template (not provided
+   with CAT12). Please note that zipped file can only be handled with this standalone batch and also
+   note the multiple quotes for parameter a1 and a2.
+
+   cat_standalone.sh -s $SPMROOT -m /Applications/MATLAB/MATLAB_Runtime/v93 \
+       -b ${cwd}/cat_standalone_segment.m sTRIO0001.nii \
+       -a "matlabbatch{1}.spm.tools.cat.estwrite.output.surface = 0;"
+   Preprocess (segment) the single file sTRIO0001.nii using the default CAT12 preprocessing batch,
+   but skip surface estimation.
+
+   -----------------------------------------------------------------------------------------------
+   Longitudinal Segmentation
+     -a1 longitudinal model (0 - developmental; 1 - plasticity/learning; 2 - aging; 3 - save models 1 and 2)
+     -a2 TPM
+   -----------------------------------------------------------------------------------------------
+   cat_standalone.sh -s $SPMROOT -m /Applications/MATLAB/MATLAB_Runtime/v93 \
+       -b ${cwd}/cat_standalone_segment_long.m sTRIO000*.nii \
+       -a1 "2"
+   Preprocess (segment) the files sTRIO000*.nii with the longitudinal pipeline optimized for
+   detecting aging/developmental effects. In order to choose the longitudinal model optimized for
+   detecting small changes due to plasticity/learning change the a1 parameter to "1".
+
+   cat_standalone.sh -s $SPMROOT -m /Applications/MATLAB/MATLAB_Runtime/v93 \
+       -b ${cwd}/cat_standalone_segment_long.m sTRIO000*.nii \
+       -a1 "1" -a2 " '${cat12_dir}/templates_MNI152NLin2009cAsym/TPM_Age11.5.nii' "
+   Preprocess (segment) the files sTRIO000*.nii with the longitudinal pipeline optimized for
+   detecting plasticity/learning effects and use the children TPM provided with CAT12.
+   Please note the multiple quotes for parameter a2.
+
+   -----------------------------------------------------------------------------------------------
+   Segmentation (Simple Mode)
+   -----------------------------------------------------------------------------------------------
+   cat_standalone.sh -s $SPMROOT -m /Applications/MATLAB/MATLAB_Runtime/v93 \
+       -b ${cwd}/cat_standalone_simple.m sTRIO0001.nii
+   Process the single file sTRIO0001.nii using the simple processing batch.
+
+   -----------------------------------------------------------------------------------------------
+   Resample & Smooth Surfaces
+     -a1 smoothing filter size surface values
+     -a2 use 32k mesh from HCP (or 164k mesh from Freesurfer)
+   -----------------------------------------------------------------------------------------------
+   cat_standalone.sh -s $SPMROOT -m /Applications/MATLAB/MATLAB_Runtime/v93 \
+       -b ${cwd}/cat_standalone_resample.m lh.thickness.sTRIO0001 \
+       -a1 "12" -a2 "1"
+   Resample and smooth the single thickness file lh.thickness.sTRIO0001 with 12mm and save the
+   resampled mesh as 32k mesh (HCP conform mesh). Only the left surface file has to be defined.
+   The right hemisphere is processed automatically.
+
+   -----------------------------------------------------------------------------------------------
+   Smoothing
+     -a1 smoothing filter size
+     -a2 prepending string for smoothed file (e.g. 's6')
+   -----------------------------------------------------------------------------------------------
+   cat_standalone.sh -s $SPMROOT -m /Applications/MATLAB/MATLAB_Runtime/v93 \
+       -b ${cwd}/cat_standalone_smooth.m sTRIO*nii \
+       -a1 "[6 6 6]" -a2 " 's6' "
+   Smooth the volume files sTRIO*nii with 6mm and prepend the string "s6" to the smoothed files.
+   Please note the multiple quotes for parameter a2.
+
+   -----------------------------------------------------------------------------------------------
+   Dicom Import
+     -a1 directory structure
+     -a2 output directory
+   -----------------------------------------------------------------------------------------------
+   cat_standalone.sh -s $SPMROOT -m /Applications/MATLAB/MATLAB_Runtime/v93 \
+       -b ${cwd}/cat_standalone_dicom2nii.m *.dcm \
+       -a1 " 'patid_date' " -a2 "{'converted'}"
+   Import DICOM files *.dcm and save converted nifti files in directory "converted" with structure
+   ./<PatientID>/<StudyDate-StudyTime>/<ProtocollName>
+   Other options for directory structure are:
+     'flat'       No directory hierarchy
+     'series'     ./<ProtocollName>
+     'patid_date' ./<PatientID>/<StudyDate-StudyTime>/<ProtocollName>
+     'patid'      ./<PatientID>/<ProtocollName>
+     'date_time'  ./<StudyDate-StudyTime>/<ProtocollName>
+   Please note the multiple quotes for parameter a1.
+
+   -----------------------------------------------------------------------------------------------
+   De-Facing
+   -----------------------------------------------------------------------------------------------
+   cat_standalone.sh -s $SPMROOT -m /Applications/MATLAB/MATLAB_Runtime/v93 \
+       -b ${cwd}/cat_standalone_deface.m sTRIO*.nii
+   Apply de-facing to sTRIO*.nii and save the files prefixed by "anon_".
+
+   -----------------------------------------------------------------------------------------------
+   Estimate and Save Quality Measures for Volumes or Surfaces
+     -a1 csv output filename
+     -a2 enable global scaling with TIV (only for volumes meaningful)
+   -----------------------------------------------------------------------------------------------
+   cat_standalone.sh -s $SPMROOT -m /Applications/MATLAB/MATLAB_Runtime/v93 \
+       -b ${cwd}/cat_standalone_get_quality.m mwp1sTRIO*nii \
+       -a1 " 'Quality_measures.csv' " -a2 "1"
+   Estimate mean z-scores using global scaling with TIV for the files mwp1sTRIO*nii and save quality
+   measures in Quality_measures.csv for external analysis. Processing of surface meshes is also
+   supported.
+   Please note the multiple quotes for parameter a1.
+
+   -----------------------------------------------------------------------------------------------
+   Estimate mean/volume inside ROI
+     -a1 output-file string
+   -----------------------------------------------------------------------------------------------
+   cat_standalone.sh -s $SPMROOT -m /Applications/MATLAB/MATLAB_Runtime/v93 \
+       -b ${cwd}/cat_standalone_get_ROI_values.m catROI_*.xml \
+       -a1 " 'ROI' "
+   Save mean volume values in mL (e.g. GM volume) or the mean surface values (e.g. thickness) for
+   all data catROI_*.xml in a csv-file. The csv-file is named "ROI_" followed by the atlas name
+   and the name of the measure (e.g. Vgm).
+   Please note the multiple quotes for parameter a1.
+
+   -----------------------------------------------------------------------------------------------
+   TFCE Statistical Estimation
+     -a1 contrast number
+     -a2 number of permutations
+   -----------------------------------------------------------------------------------------------
+   cat_standalone.sh -s $SPMROOT -m /Applications/MATLAB/MATLAB_Runtime/v93 \
+       -b ${cwd}/cat_standalone_tfce.m SPM.mat \
+       -a1 "2" -a2 "20000"
+   Call estimation of TFCE statistics for the given SPM.mat file for contrast number 2 with 20000
+   permutations.
+
+   -----------------------------------------------------------------------------------------------
+   Parallelization
+   -----------------------------------------------------------------------------------------------
+   cat_parallelize.sh -p 8 -l /tmp \
+       -c "cat_standalone.sh  -s $SPMROOT -m /Applications/MATLAB/MATLAB_Runtime/v93 -b ${cwd}/cat_standalone_segment.m" sTRIO*.nii
+   Parallelize CAT12 preprocessing by splitting all sTRIO*.nii files into 8 jobs
+   (processes) and save log file in /tmp folder.
+
+   The parameters SPMROOT and MCRROOT have to be defined (exported) to skip the use of the flags -s -m.
+
+INPUT:
+   nifti files or surface data
+
+OUTPUT:
+   processed images and optionally surfaces according to settings in cat_standalone_*.m
+
+USED FUNCTIONS:
+   cat_parallelize.sh
+   SPM12 standalone version (compiled)
+   CAT12 toolbox (compiled within SPM12 if installed)
+   MATLAB Compiler Runtime R2017b (Version 9.3)
+
+This script was written by Christian Gaser (christian.gaser@uni-jena.de).
+This is ${version}.
 
 
 Known issues:
 
 - Parallelization with cat_parallelize.sh is not implemented yet.
-- Longitudinal segmentation with cat_standalone_segment_long.txt
+- Longitudinal segmentation with cat_standalone_segment_long.m
   is not tested yet.
 
 
 Contact information:
 
 Any problems or concerns regarding this container should be reported
-to Malgorzata Wierzba (m.wierzba@fz-juelich.de) or Michael Hanke
-(m.hanke@fz-juelich.de).
+to Malgorzata Wierzba (m.wierzba@fz-juelich.de), Michael Hanke
+(m.hanke@fz-juelich.de) or Felix Hoffstaedter (f.hoffstaedter@fz-juelich.de)
 
 
 Acknowledgements:
