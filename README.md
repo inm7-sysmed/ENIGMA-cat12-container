@@ -21,7 +21,7 @@ Execute the built command with root privileges:
 
 ## How to use:
 
-In principle this container allows you to perform the very same types of analysis that are possible with the standalone version of CAT. It is assumed that the user is familiar with the content of the batch files dedicated for the use with the standalone version of CAT (`cat_standalone_segment.txt`, `cat_standalone_simple.txt`, `cat_standalone_resample.txt`, `cat_standalone_smooth.txt`) and can modify their content according to his/her needs. For more details, please refer to the [CAT12 documentation and manual](http://www.neuro.uni-jena.de/cat12/CAT12-Manual.pdf).
+In principle this container allows you to perform the very same types of analysis that are possible with the standalone version of CAT. It is assumed that the user is familiar with the content of the batch files dedicated for the use with the standalone version of CAT (`cat_standalone_segment.m`, `cat_standalone_simple.m`, `cat_standalone_resample.m`, `cat_standalone_smooth.m`) and can modify their content according to his/her needs. For more details, please refer to the [CAT12 documentation and manual](http://www.neuro.uni-jena.de/cat12/CAT12-Manual.pdf).
 
 ## Available batch files:
 
@@ -31,11 +31,11 @@ The content of the batch files can be explored by using the `view` and `copy` su
 
 To view a batch file, use the `view` subcommand:
 
-`singularity run cat12.8.1_r1980.simg view cat_standalone_smooth.txt`
+`singularity run cat12.8.1_r1980.simg view cat_standalone_smooth.m`
 
 To copy a batch file to your computer, use the `copy` subcommand and specify destination path as an additional argument:
 
-`singularity run cat12.8.1_r1980.simg copy cat_standalone_smooth.txt $HOME`
+`singularity run cat12.8.1_r1980.simg copy cat_standalone_smooth.m $HOME`
 
 Make sure that the specified path is mounted to the container (more information on this can be found below) and that you have write access to this path!
 
@@ -51,11 +51,11 @@ Run the CAT analysis with the following command:
 
 To use a default batch file, use one of the files included in the container (`/batch`), for instance:
 
-`singularity run --cleanenv cat12.8.1_r1980.simg -b /batch/cat_standalone_segment.txt T1.nii`
+`singularity run --cleanenv cat12.8.1_r1980.simg -b /batch/cat_standalone_segment.m T1.nii`
 
 To use your own, customised batch file, simply specify its path, for instance:
 
-`singularity run --cleanenv cat12.8.1_r1980.simg -b $HOME/cat_standalone_segment.txt T1.nii`
+`singularity run --cleanenv cat12.8.1_r1980.simg -b $HOME/cat_standalone_segment.m T1.nii`
 
 ## Bind paths:
 
@@ -63,31 +63,31 @@ Please note that most of the host files remain inaccessible from within the cont
 
 If you want the container to be able to access other locations, specify a bind path of your choice. For instance, to make the contents of the `/data` folder on your computer available in the `/mnt` folder inside the container, specify the mount point in the following way:
 
-`singularity run --cleanenv --bind /data:/mnt cat12.8.1_r1980.simg -b /batch/cat_standalone_segment.txt /mnt/T1.nii`
+`singularity run --cleanenv --bind /data:/mnt cat12.8.1_r1980.simg -b /batch/cat_standalone_segment.m /mnt/T1.nii`
 
 ## Examples:
 
 CAT12 segmentation batch:
 
-`singularity run --cleanenv cat12.8.1_r1980.simg -b cat_standalone_segment.txt T1.nii`
+`singularity run --cleanenv cat12.8.1_r1980.simg -b cat_standalone_segment.m T1.nii`
 
 CAT12 simple processing batch:
 
-`singularity run --cleanenv cat12.8.1_r1980.simg -b cat_standalone_simple.txt T1.nii`
+`singularity run --cleanenv cat12.8.1_r1980.simg -b cat_standalone_simple.m T1.nii`
 
 CAT12 resample & smooth batch:
 
-`singularity run --cleanenv cat12.8.1_r1980.simg -b cat_standalone_resample.txt -a1 "12" -a2 "1" lh.thickness.T1`
+`singularity run --cleanenv cat12.8.1_r1980.simg -b cat_standalone_resample.m -a1 "12" -a2 "1" lh.thickness.T1`
 
 CAT12 volume smoothing batch:
 
-`singularity run --cleanenv cat12.8.1_r1980.simg -b cat_standalone_smooth.txt -a1 "[6 6 6]" -a2 "'s6'" T1.nii`
+`singularity run --cleanenv cat12.8.1_r1980.simg -b cat_standalone_smooth.m -a1 "[6 6 6]" -a2 "'s6'" T1.nii`
 
 
 ## Known issues:
 
 * Parallelization with `cat_parallelize.sh` is not implemented yet.
-* Longitudinal segmentation with `cat_standalone_segment_long.txt` is not tested yet.
+* Longitudinal segmentation with `cat_standalone_segment_long.m` is not tested yet.
 
 
 ## Contact information:
