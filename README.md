@@ -1,8 +1,10 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6021002.svg)](https://doi.org/10.5281/zenodo.6021002)
 
-# CAT container
+# ENIGMA CAT container
 
 This container allows to run the standalone, compiled version of the [Computational Anatomy Toolbox (CAT)](http://www.neuro.uni-jena.de/cat/), which is an extension to [SPM](https://www.fil.ion.ucl.ac.uk/spm/software/) software. Using the container does not require the availability of a MATLAB licence.
+
+https://sites.google.com/view/enigma-cat12/enigma-cat12/standalone
 
 The container includes:
 
