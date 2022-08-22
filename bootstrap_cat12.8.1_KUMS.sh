@@ -55,7 +55,7 @@ datalad save -m "Import script to tune the CAT outputs for storage"
 # create dedicated input and output locations. Results will be pushed into the
 # output sibling, and the analysis will start with a clone from the input
 # sibling.
-datalad create-sibling-ria -s ${PROJECT}_in "${input_store}" --new-store-ok
+datalad create-sibling-ria -s ${PROJECT}_in "${input_store}" # --new-store-ok
 datalad create-sibling-ria -s ${PROJECT}_out "${output_store}" #--new-store-ok
 
 
