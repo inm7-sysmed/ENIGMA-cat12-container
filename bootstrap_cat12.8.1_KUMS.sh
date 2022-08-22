@@ -117,7 +117,7 @@ git checkout -b "job-\${JOBID}"
 # "containers-run" does not rely on any property of the immediate
 # computational environment (env vars, services, etc)
 find \\
-  inputs/${MRI_dir}/*\${subid} \\
+  inputs/${MRI_dir}/*/\${subid} \\
   -name '*T1w.nii.gz' \\
   -exec sh -c '
     odir=\$(echo {} | cut -d / -f3-4);
@@ -314,7 +314,7 @@ EOT
 cat > code/process.condor_dag << "EOT"
 # Processing DAG
 EOT
-for s in $(find inputs/${MRI_dir} -maxdepth 1 -name 'sub-*' -printf '%f\n'); do
+for s in $(find inputs/${MRI_dir}/controlbids -maxdepth 2 -name 'sub-*' -printf '%f\n'); do
   printf "JOB ${s%.*} code/process.condor_submit\nVARS ${s%.*} subject=\"$s\"\n" >> code/process.condor_dag
 done
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
