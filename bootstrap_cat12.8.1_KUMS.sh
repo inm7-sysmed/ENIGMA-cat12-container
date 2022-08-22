@@ -118,7 +118,7 @@ datalad get -n "inputs/${MRI_dir}"
 # computational environment (env vars, services, etc)
 find \\
   inputs/${MRI_dir}/ \\
-  -name '\${subid}*T1w.nii.gz' \\
+  -name "\${subid}*T1w.nii.gz" \\
   -exec sh -c '
     odir=\$(echo {} | cut -d / -f3-4);
     datalad -c datalad.annex.retry=12 containers-run \\
