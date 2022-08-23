@@ -129,7 +129,7 @@ find \\
         mkdir -p {outputs[0]} \\
         && cp {inputs[0]} {outputs[0]} \\
         && /singularity -b ${CAT_BATCH} {outputs[0]}/*.nii.gz \\
-        && rm {outputs[0]}/*.nii* \\
+        && rm -f {outputs[0]}/*.nii* \\
         && gzip {outputs[0]}/*/*.nii \\
         " \\
   ' \\;
