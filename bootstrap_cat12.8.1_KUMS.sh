@@ -69,9 +69,6 @@ git commit --amend -m "Register ${SAMPLE} BIDS dataset as input"
 cat > code/participant_job << EOT
 #!/bin/bash
 
-# activate virtual environment for DataLad 0.16.+
-source ~/datalad_venv/datalad-dev/bin/activate
-
 # the job assumes that it is a good idea to run everything in PWD
 # the job manager should make sure that is true
 
@@ -120,7 +117,7 @@ find \\
   inputs/${MRI_dir}/ \\
   -name "\${subid}*T1w.nii.gz" \\
   -exec sh -c '
-    odir=\$(echo {} | cut -d / -f3-4);
+    odir=\$(echo {} | cut -d / -f4-5);
     datalad -c datalad.annex.retry=12 containers-run \\
       -m "Compute \$odir" \\
       -n cat12-8 \\
@@ -139,9 +136,9 @@ find \\
 
 # remove big files from results after hashing before pushing to ria
 datalad drop --what filecontent --reckless kill \
-  \${subid}/mri/iy* \${subid}/mri/y* \${subid}/mri/anon_m* \
-  \${subid}/mri/wj* \${subid}/*/*.pdf \${subid}/surf/*sphere* \
-  \${subid}/surf/*pial* \${subid}/surf/*white*
+  */\${subid}/mri/iy* */\${subid}/mri/y* */\${subid}/mri/anon_m* \
+  */\${subid}/mri/wj* */\${subid}/*/*.pdf */\${subid}/surf/*sphere* \
+  */\${subid}/surf/*pial* */\${subid}/surf/*white*
 
 # it may be that the above command did not yield any outputs
 # and no commit was made (no T1s found for the given participant)
