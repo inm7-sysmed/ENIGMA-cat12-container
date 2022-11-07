@@ -20,6 +20,12 @@ output_store="ria+file:///data/project/sleep_ENIGMA_Cognition/sleep_brain_ER/Dat
 
 # define the location of the stores all analysis inputs will be obtained from
 raw_store="ria+http://camcan.ds.inm7.de#~super"
+#raw_store="/data/project/sleep_ENIGMA_Cognition/sleep_brain_ER/cluster/data/camcan_datalad_orig"
+
+# Build CAT container here: https://github.com/inm7-sysmed/ENIGMA-cat12-container
+container_store="ria+file:///data/project/cat_preprocessed/dataladstore#~cat12.8"
+container="cat12.8.1_r1980.simg"
+
 # define the temporal working directory to clone and process each subject on
 temporary_store=/tmp
 # define directory of MRI datalad
@@ -51,13 +57,14 @@ datalad save -m "Import script to tune the CAT outputs for storage"
 # create dedicated input and output locations. Results will be pushed into the
 # output sibling, and the analysis will start with a clone from the input
 # sibling.
-datalad create-sibling-ria -s ${PROJECT}_in "${input_store}" # --new-store-ok
-datalad create-sibling-ria -s ${PROJECT}_out "${output_store}" #--new-store-ok
+datalad create-sibling-ria -s ${PROJECT}_in "${input_store}"  --new-store-ok
+datalad create-sibling-ria -s ${PROJECT}_out "${output_store}" --new-store-ok --alias ${SAMPLE}_${PROJECT}
 
 
 # register the input dataset, a superdataset comprising all participants
 datalad clone -d . ${raw_store} inputs/${SAMPLE}
-# datalad get -n inputs/${MRI_dir}
+datalad get -n inputs/${MRI_dir}
+
 git commit --amend -m "Register ${SAMPLE} BIDS dataset as input"
 
 
@@ -113,7 +120,7 @@ find \\
   inputs/${MRI_dir}/ \\
   -name "\${subid}*T1w.nii.gz" \\
   -exec sh -c '
-    odir=\$(echo {} | cut -d / -f3-4);
+    odir=\$(echo {} | cut -d / -f4);
     datalad -c datalad.annex.retry=12 containers-run \\
       -m "Compute \$odir" \\
       -n cat12-8 \\
@@ -307,7 +314,7 @@ EOT
 cat > code/process.condor_dag << "EOT"
 # Processing DAG
 EOT
-for s in $(find inputs/${MRI_dir}/controlbids -maxdepth 2 -name 'sub-*' -printf '%f\n'); do
+for s in $(find inputs/${MRI_dir} -maxdepth 1 -name 'sub-*' -printf '%f\n'); do
   printf "JOB ${s%.*} code/process.condor_submit\nVARS ${s%.*} subject=\"$s\"\n" >> code/process.condor_dag
 done
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
