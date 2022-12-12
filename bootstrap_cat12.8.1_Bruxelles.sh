@@ -6,7 +6,7 @@ set -e -u
 PROJECT="ENIGMA_sleep"
 
 # define SAMPLE to be processed
-SAMPLE=KUMS
+SAMPLE="Bruxelles"
 
 # define ID for git commits (take from local user configuration)
 git_name="$(git config user.name)"
@@ -14,23 +14,25 @@ git_email="$(git config user.email)"
 # get current work dir
 CWD=$(pwd)
 # define the input ria-store only to clone from
-input_store="ria+file:///data/project/sleep_ENIGMA_insomnia/DataLad/inputstore"
+input_store="ria+file:///data/project/sleep_ENIGMA_deprivation/dataladstore/inputstore"
 # define the output ria-store to push all results to
-output_store="ria+file:///data/project/sleep_ENIGMA_insomnia/DataLad/ria-ENIGMA-sleep"
+output_store="ria+file:///data/project/sleep_ENIGMA_deprivation/dataladstore"
 
 # define the location of the stores all analysis inputs will be obtained from
-raw_store="ria+file:///data/project/sleep_ENIGMA_insomnia/DataLad/ria-ENIGMA-sleep#~KUMS_BIDS_freesurfer"
+raw_store="ria+file:///data/project/sleep_ENIGMA_deprivation/dataladstore#~Bruxelles_BIDS"
+#raw_store="/data/project/sleep_ENIGMA_Cognition/sleep_brain_ER/cluster/data/camcan_datalad_orig"
 
 # Build CAT container here: https://github.com/inm7-sysmed/ENIGMA-cat12-container
 container_store="ria+file:///data/project/cat_preprocessed/dataladstore#~cat12.8"
-container="cat12.8.1_r1980.simg"
+container="cat12.8.1_r2042.simg"
+
 # define the temporal working directory to clone and process each subject on
 temporary_store=/tmp
 # define directory of MRI datalad
-MRI_dir=${SAMPLE}/bids
+MRI_dir=${SAMPLE}
 
 # define CAT12 batch to process data
-CAT_BATCH="code/cat_standalone_segment_enigma_subdir.m"
+CAT_BATCH="code/cat_standalone_segment_enigma.m"
 
 
 # all results a tracked in a single output dataset
@@ -49,19 +51,20 @@ datalad containers-add \
   cat12-8
 git commit --amend -m 'Register CAT pipeline dataset'
 
-cp ../ENIGMA-cat12-container/cat_standalone_segment_enigma_subdir.m code
+cp ../ENIGMA-cat12-container/cat_standalone_segment_enigma.m code
 datalad save -m "Import script to tune the CAT outputs for storage"
 
 # create dedicated input and output locations. Results will be pushed into the
 # output sibling, and the analysis will start with a clone from the input
 # sibling.
-datalad create-sibling-ria -s ${PROJECT}_in "${input_store}" # --new-store-ok
-datalad create-sibling-ria -s ${PROJECT}_out "${output_store}" #--new-store-ok
+datalad create-sibling-ria -s ${PROJECT}_in "${input_store}"  --new-store-ok
+datalad create-sibling-ria -s ${PROJECT}_out "${output_store}" --new-store-ok --alias ${SAMPLE}_${PROJECT}
 
 
 # register the input dataset, a superdataset comprising all participants
 datalad clone -d . ${raw_store} inputs/${SAMPLE}
-# datalad get -n inputs/${MRI_dir}
+datalad get -n inputs/${MRI_dir}
+
 git commit --amend -m "Register ${SAMPLE} BIDS dataset as input"
 
 
@@ -117,7 +120,7 @@ find \\
   inputs/${MRI_dir}/ \\
   -name "\${subid}*T1w.nii.gz" \\
   -exec sh -c '
-    odir=\$(echo {} | cut -d / -f4-5);
+    odir=\$(echo {} | cut -d / -f3-4);
     datalad -c datalad.annex.retry=12 containers-run \\
       -m "Compute \$odir" \\
       -n cat12-8 \\
@@ -136,9 +139,9 @@ find \\
 
 # remove big files from results after hashing before pushing to ria
 datalad drop --what filecontent --reckless kill \
-  */\${subid}/mri/iy* */\${subid}/mri/y* */\${subid}/mri/anon_m* \
-  */\${subid}/mri/wj* */\${subid}/*/*.pdf */\${subid}/surf/*sphere* \
-  */\${subid}/surf/*pial* */\${subid}/surf/*white*
+  \${subid}/mri/iy* \${subid}/mri/y* \${subid}/mri/anon_m* \
+  \${subid}/mri/wj* \${subid}/*/*.pdf \${subid}/surf/*sphere* \
+  \${subid}/surf/*pial* \${subid}/surf/*white*
 
 # it may be that the above command did not yield any outputs
 # and no commit was made (no T1s found for the given participant)
@@ -311,7 +314,7 @@ EOT
 cat > code/process.condor_dag << "EOT"
 # Processing DAG
 EOT
-for s in $(find inputs/${MRI_dir}/controlbids -maxdepth 2 -name 'sub-*' -printf '%f\n'); do
+for s in $(find inputs/${MRI_dir} -maxdepth 1 -name 'sub-*' -printf '%f\n'); do
   printf "JOB ${s%.*} code/process.condor_submit\nVARS ${s%.*} subject=\"$s\"\n" >> code/process.condor_dag
 done
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
