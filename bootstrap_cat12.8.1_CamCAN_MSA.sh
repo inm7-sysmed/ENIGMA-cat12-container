@@ -132,8 +132,8 @@ find \\
       -n cat12-8 \\
       --explicit \\
       -o \$odir \\
+      -o code/MSA \\
       -i {} \\
-      -i code/MSA \\
       sh -e -u -x -c "
         rm -rf {outputs[0]} ;
         mkdir -p {outputs[0]} \\
