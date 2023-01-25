@@ -119,10 +119,10 @@ matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.Schaefer2018_100Par
 matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.Schaefer2018_200Parcels_17Networks_order = 1;
 matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.Schaefer2018_400Parcels_17Networks_order = 1;
 matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.Schaefer2018_600Parcels_17Networks_order = 1;
-matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.ownatlas = {fullfile(pwd,'code/MSA/3T/Subcortex-Only/Tian_Subcortex_S1_3T_2009cAsym.nii.gz')};
-matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.ownatlas = {fullfile(pwd,'code/MSA/3T/Subcortex-Only/Tian_Subcortex_S2_3T_2009cAsym.nii.gz')};
-matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.ownatlas = {fullfile(pwd,'code/MSA/3T/Subcortex-Only/Tian_Subcortex_S3_3T_2009cAsym.nii.gz')};
-matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.ownatlas = {fullfile(pwd,'code/MSA/3T/Subcortex-Only/Tian_Subcortex_S4_3T_2009cAsym.nii.gz')};
+matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.ownatlas = {fullfile(pwd,'code/MSA/3T/Subcortex-Only/Tian_Subcortex_S1_3T_2009cAsym.nii,1')};
+matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.ownatlas = {fullfile(pwd,'code/MSA/3T/Subcortex-Only/Tian_Subcortex_S2_3T_2009cAsym.nii,1')};
+matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.ownatlas = {fullfile(pwd,'code/MSA/3T/Subcortex-Only/Tian_Subcortex_S3_3T_2009cAsym.nii,1')};
+matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.ownatlas = {fullfile(pwd,'code/MSA/3T/Subcortex-Only/Tian_Subcortex_S4_3T_2009cAsym.nii,1')};
 
 % Writing options (see cat_defaults for the description of parameters)
 %   native    0/1     (none/yes)
