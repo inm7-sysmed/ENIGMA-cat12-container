@@ -53,7 +53,7 @@ datalad containers-add \
   cat12-8
 git commit --amend -m 'Register CAT pipeline dataset'
 
-cp ../ENIGMA-cat12-container/cat_standalone_segment_enigma.m code
+cp ../ENIGMA-cat12-container/cat_standalone_segment_enigma_MSA.m code
 datalad save -m "Import script to tune the CAT outputs for storage"
 
 # register atlas dataset ### GENERALIZE ###
