@@ -14,17 +14,17 @@ From: debian:buster-slim
 
     # download software & unzip
     MCRURL="https://ssd.mathworks.com/supportfiles/downloads/R2017b/deployment_files/R2017b/installers/glnxa64/MCR_R2017b_glnxa64_installer.zip"
-    SPMURL="http://www.neuro.uni-jena.de/cat12/CAT12.8.1_r2042_R2017b_MCR_Linux.zip"
+    SPMURL="http://www.neuro.uni-jena.de/cat12/CAT12.8.2_R2017b_MCR_Linux.zip"
 
     cd /downloads
     wget "${MCRURL}" && unzip -d /downloads/MCR MCR_R2017b_glnxa64_installer.zip
-    wget "${SPMURL}" && unzip -d /code/SPM CAT12.8.1_r2042_R2017b_MCR_Linux.zip
+    wget "${SPMURL}" && unzip -d /code/SPM CAT12.8.2_R2017b_MCR_Linux.zip
 
     # install MCR
     /downloads/MCR/install -mode silent -agreeToLicense yes
 
     # generalize CAT12 version
-    mv /code/SPM/CAT12.8.1_r2042_R2017b_MCR_Linux/ /code/SPM/MCR_Linux/
+    mv /code/SPM/CAT12.8.2_R2017b_MCR_Linux/ /code/SPM/MCR_Linux/
 
     # install SPM
     /code/SPM/MCR_Linux/run_spm12.sh /usr/local/MATLAB/MATLAB_Runtime/v93 quit
