@@ -115,12 +115,12 @@ matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.mori = 1;
 matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.thalamus = 1;
 matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.anatomy3 = 1;
 matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.julichbrain = 1;
-matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.Tian_Subcortex_S4_7T = 1;
+matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.Tian_Subcortex_S4_7T = 0;
 matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.Schaefer2018_100Parcels_17Networks_order = 1;
 matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.Schaefer2018_200Parcels_17Networks_order = 1;
 matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.Schaefer2018_400Parcels_17Networks_order = 1;
 matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.Schaefer2018_600Parcels_17Networks_order = 1;
-matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.ownatlas = {''};
+matlabbatch{1}.spm.tools.cat.estwrite.output.ROImenu.atlases.ownatlas = {'code/Tian_Subcortex_S2_7T.nii'};
 
 % Writing options (see cat_defaults for the description of parameters)
 %   native    0/1     (none/yes)
