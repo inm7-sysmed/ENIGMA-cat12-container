@@ -6,7 +6,7 @@ set -e -u
 PROJECT="cat12.8.2"
 
 # define SAMPLE to be processed
-SAMPLE="eNKI"
+SAMPLE="CamCAN"
 
 # define ID for git commits (take from local user configuration)
 git_name="$(git config user.name)"
