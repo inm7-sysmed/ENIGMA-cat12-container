@@ -3,7 +3,7 @@ set -e -u
 # Jobs are set up to not require a shared filesystem (except for the lockfile)
 
 # project name space
-PROJECT="ENIGMA_sleep"
+PROJECT="cat12.8.2"
 
 # define SAMPLE to be processed
 SAMPLE="eNKI"
@@ -14,12 +14,12 @@ git_email="$(git config user.email)"
 # get current work dir
 CWD=$(pwd)
 # define the input ria-store only to clone from
-input_store="ria+file:///data/project/sleep_ENIGMA_Cognition/sleep_brain_ER/DataLad/inputstore"
+input_store="ria+file:///data/project/sleep_SFB/RIA-STORE-SLEEP/inputstore"
 # define the output ria-store to push all results to
-output_store="ria+file:///data/project/sleep_ENIGMA_Cognition/sleep_brain_ER/DataLad/ria-ENIGMA-sleep"
+output_store="ria+file:///data/project/sleep_SFB/RIA-STORE-SLEEP"
 
 # define the location of the stores all analysis inputs will be obtained from
-raw_store="ria+file:///data/project/cat_preprocessed/dataladstore#~eNKI_BIDS_T1w_2020"
+raw_store="ria+http://camcan.ds.inm7.de#~super"
 #raw_store="/data/project/sleep_ENIGMA_Cognition/sleep_brain_ER/cluster/data/camcan_datalad_orig"
 
 # Build CAT container here: https://github.com/inm7-sysmed/ENIGMA-cat12-container
@@ -29,7 +29,7 @@ container="cat12.8.2_r2166.simg"
 # define the temporal working directory to clone and process each subject on
 temporary_store=/tmp
 # define directory of MRI datalad
-MRI_dir=${SAMPLE}
+MRI_dir=${SAMPLE}/cc700_mri
 
 # define CAT12 batch to process data
 CAT_BATCH="code/cat_standalone_segment_enigma.m"
@@ -121,7 +121,7 @@ find \\
   inputs/${MRI_dir}/ \\
   -name "\${subid}*T1w.nii.gz" \\
   -exec sh -c '
-    odir=\$(echo {} | cut -d / -f3-4);
+    odir=\$(echo {} | cut -d / -f4);
     datalad -c datalad.annex.retry=12 containers-run \\
       -m "Compute \$odir" \\
       -n cat12-8 \\
