@@ -109,7 +109,7 @@ git checkout -b "job-\${JOBID}"
 # re-run we want to be able to do fine-grained recomputing of individual
 # outputs. The recorded calls will have specific paths that will enable
 # recomputation outside the scope of the original Condor setup
-datalad get -n "inputs/${MRI_dir}/\${subid}/T1w"
+datalad get "inputs/${MRI_dir}/\${subid}/T1w/T1w_acpc_dc_restore.nii.gz"
 
 
 # the meat of the matter
