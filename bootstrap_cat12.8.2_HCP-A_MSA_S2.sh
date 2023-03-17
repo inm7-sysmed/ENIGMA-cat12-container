@@ -119,7 +119,7 @@ datalad get -n "inputs/${MRI_dir}/\${subid}"
 # computational environment (env vars, services, etc)
 find \\
   inputs/${MRI_dir}/ \\
-  -name "\${subid}*T1w.nii.gz" \\
+  -name "T1w_acpc_dc_restore.nii.gz" \\
   -exec sh -c '
     odir=sub-\$(echo {} | cut -d / -f3 | cut -c1-10);
     datalad -c datalad.annex.retry=12 containers-run \\
@@ -138,7 +138,7 @@ find \\
         " \\
   ' \\;
 
-# remove big files from results after hashing before pushing to ria
+# remove big files from results after hashing before pushing to riahcp_a
 datalad drop --what filecontent --reckless kill \
   \${subid}/*/mri/iy* \${subid}/*/mri/y* \${subid}/*/mri/anon_m* \
   \${subid}/*/mri/wj* \${subid}/*/*/*.pdf \${subid}/*/surf/*sphere* \
@@ -257,6 +257,9 @@ universe       = vanilla
 request_cpus   = 1
 request_memory = 3G
 request_disk   = 4G
+
+# keep environment
+getenv         = True
 
 # be nice and only use free resources
 nice_user = true
