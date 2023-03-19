@@ -140,9 +140,9 @@ find \\
 
 # remove big files from results after hashing before pushing to ria
 datalad drop --what filecontent --reckless kill \
-  \${subid}/*/mri/iy* \${subid}/*/mri/y* \${subid}/*/mri/anon_m* \
-  \${subid}/*/mri/wj* \${subid}/*/*/*.pdf \${subid}/*/surf/*sphere* \
-  \${subid}/*/surf/*pial* \${subid}/*/surf/*white*
+  \${subid}/mri/iy* \${subid}/mri/y* \${subid}/mri/anon_m* \
+  \${subid}/mri/wj* \${subid}/*/*.pdf \${subid}/surf/*sphere* \
+  \${subid}/surf/*pial* \${subid}/surf/*white*
 
 
 # it may be that the above command did not yield any outputs
