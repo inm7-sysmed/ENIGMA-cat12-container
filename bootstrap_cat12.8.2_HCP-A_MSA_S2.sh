@@ -140,9 +140,9 @@ find \\
 
 # remove big files from results after hashing before pushing to riahcp_a
 datalad drop --what filecontent --reckless kill \
-  \${subid}/mri/iy* \${subid}/mri/y* \${subid}/mri/anon_m* \
-  \${subid}/mri/wj* \${subid}/*/*.pdf \${subid}/surf/*sphere* \
-  \${subid}/surf/*pial* \${subid}/surf/*white*
+  sub-*/mri/iy* sub-*/mri/y* sub-*/mri/anon_m* \
+  sub-*/mri/wj* sub-*/*/*.pdf sub-*/surf/*sphere* \
+  sub-*/surf/*pial* sub-*/surf/*white*
 
 
 # it may be that the above command did not yield any outputs
