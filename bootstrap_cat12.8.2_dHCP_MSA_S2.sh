@@ -319,7 +319,7 @@ EOT
 cat > code/process.condor_dag << "EOT"
 # Processing DAG
 EOT
-for s in $(find inputs/${MRI_dir} -maxdepth 1 -name 'HCA*' -printf '%f\n'); do
+for s in $(find inputs/${MRI_dir} -maxdepth 1 -name 'HC*' -printf '%f\n'); do
   printf "JOB ${s%.*} code/process.condor_submit\nVARS ${s%.*} subject=\"$s\"\n" >> code/process.condor_dag
 done
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
