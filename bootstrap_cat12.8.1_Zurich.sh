@@ -20,6 +20,8 @@ output_store="ria+file:///data/project/sleep_ENIGMA_deprivation/dataladstore"
 
 # define the location of the stores all analysis inputs will be obtained from
 raw_store="ria+file:///data/project/sleep_ENIGMA_deprivation/dataladstore#~Zurich_BIDS"
+# does the dataset contain sessions? [ true / false ]
+ses="true"
 
 # Build CAT container here: https://github.com/inm7-sysmed/ENIGMA-cat12-container
 container_store="ria+file:///data/project/cat_preprocessed/dataladstore#~cat12.8"
@@ -50,7 +52,7 @@ datalad containers-add \
   cat12-8
 git commit --amend -m 'Register CAT pipeline dataset'
 
-cp ../ENIGMA-cat12-container/cat_standalone_segment_enigma_subdir.m code/cat_standalone_segment_enigma.m
+cp code/pipeline/batches/cat_standalone_segment_enigma_subdir.m code/cat_standalone_segment_enigma.m
 datalad save -m "Import script to tune the CAT outputs for storage"
 
 # create dedicated input and output locations. Results will be pushed into the
@@ -66,6 +68,12 @@ datalad get -n inputs/${MRI_dir}
 
 git commit --amend -m "Register ${SAMPLE} BIDS dataset as input"
 
+# define target dirs for datasets with & without sessions
+if ${ses}; then
+  dstr="-f3-4"
+else
+  dstr="-f3"
+fi
 
 # the actual compute job specification
 cat > code/participant_job << EOT
@@ -119,7 +127,7 @@ find \\
   inputs/${MRI_dir}/ \\
   -name "\${subid}*T1w.nii.gz" \\
   -exec sh -c '
-    odir=\$(echo {} | cut -d / -f3-4);
+    odir=\$(echo {} | cut -d / ${dstr});
     datalad -c datalad.annex.retry=12 containers-run \\
       -m "Compute \$odir" \\
       -n cat12-8 \\

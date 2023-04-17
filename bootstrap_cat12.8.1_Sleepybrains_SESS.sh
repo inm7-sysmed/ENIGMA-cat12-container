@@ -75,7 +75,6 @@ else
   dstr="-f3"
 fi
 
-
 # the actual compute job specification
 cat > code/participant_job << EOT
 #!/bin/bash
