@@ -6,7 +6,7 @@ set -e -u
 PROJECT="ENIGMA_cat12.8.1"
 
 # define SAMPLE to be processed
-SAMPLE="eNKI"
+SAMPLE="CamCAN"
 
 # define ID for git commits (take from local user configuration)
 git_name="$(git config user.name)"
@@ -19,9 +19,9 @@ input_store="ria+file:///data/project/sleep_ENIGMA_deprivation/dataladstore/inpu
 output_store="ria+file:///data/project/sleep_ENIGMA_deprivation/dataladstore"
 
 # define the location of the stores all analysis inputs will be obtained from
-raw_store="ria+http://enki.ds.inm7.de#f380eccc-643b-11ea-a42a-ac1f6bac9bd2"
+raw_store="ria+http://camcan.ds.inm7.de#bf3d7662-ad28-11e9-b40d-a81e84238a11"
 # does the dataset contain sessions? [ true / false ]
-ses="true"
+ses="false"
 
 # Build CAT container here: https://github.com/inm7-sysmed/ENIGMA-cat12-container
 container_store="ria+file:///data/project/cat_preprocessed/dataladstore#~cat12.8"

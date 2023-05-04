@@ -3,7 +3,7 @@ set -e -u
 # Jobs are set up to not require a shared filesystem (except for the lockfile)
 
 # project name space
-PROJECT="ENIGMA_sleep"
+PROJECT="ENIGMA_cat12.8.1"
 
 # define SAMPLE to be processed
 SAMPLE="Zurich"
